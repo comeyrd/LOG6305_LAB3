@@ -3,7 +3,7 @@ from pymoo.core.problem import ElementwiseProblem
 from poly_sbst.common.abstract_executor import AbstractExecutor
 from poly_sbst.problems.abstract_problem import AbstractProblem
 
-class TestSuiteProblem(AbstractProblem):
+class UrlTestSuiteProblem(AbstractProblem):
     """
     This is the base class for performing solution evaluation.
 
@@ -37,7 +37,7 @@ class TestSuiteProblem(AbstractProblem):
         """
         super().__init__(executor, n_var, n_obj, n_ieq_constr, xl, xu)
         self.executor = executor
-        self._name = "TestSuiteProblem"
+        self._name = "UrlTestSuiteProblem"
         self.previous_coverage = 0
         self.first_evaluation = True
 
@@ -54,14 +54,14 @@ class TestSuiteProblem(AbstractProblem):
         tests = x[0]
         self.executor._full_coverage = [] # reset the coverage evaluation
         self.executor._coverage = set()
-
+        act_coverage = set()
         for test in tests:
             exceptions, execution_time, coverage = self.executor._execute_input(test)
-            
-        fitness = len(coverage)
+            act_coverage.update(coverage)
 
-        self.execution_data[self.n_evals] = {"input": test, "output": fitness, "execution_time": execution_time}
+        fitness = len(act_coverage)/len(tests)
 
+        self.execution_data[self.n_evals] = {"input": test, "output": len(act_coverage), "execution_time": execution_time,"n_test":len(tests)}
         self.n_evals += 1
 
-    out["F"] = -fitness
+        out["F"] = -fitness
